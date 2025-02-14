@@ -1,9 +1,12 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from django.contrib.auth.models import User
 
 
 class UserRegistrationSeralizer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True,)
+    username = serializers.CharField(validators=[UniqueValidator(queryset=User.objects.all())])
+        
 
     class Meta:
         model = User
@@ -16,6 +19,7 @@ class UserRegistrationSeralizer(serializers.ModelSerializer):
 
         if not password:
             raise serializers.ValidationError({"message":"Password is Missing."})
+        
 
             
             
