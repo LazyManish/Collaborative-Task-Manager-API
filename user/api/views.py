@@ -5,7 +5,7 @@ from rest_framework import status,generics
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 
 
@@ -42,6 +42,22 @@ class UserLoginView(APIView):
                  }, status= status.HTTP_200_OK)
             return Response({"message":"Invalid Credentials"}, status= status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class UserLogoutView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self,request):
+
+        try:
+            refresh_token = request.data.get('refresh_token')
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            return Response({"message":"user logged out successfully."},status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"Error":str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     
 
